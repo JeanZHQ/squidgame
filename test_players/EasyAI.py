@@ -1,9 +1,16 @@
-import random
-from BaseAI import BaseAI
 import numpy as np
+import random
+import sys
+import os 
+# setting path to parent directory
+sys.path.append(os.getcwd())
+
+from BaseAI import BaseAI
 from Grid import Grid
 
-class ComputerAI(BaseAI):
+OPPONENT = lambda player: 3 - player
+
+class EasyAI(BaseAI):
 
     def __init__(self, initial_position = None) -> None:
         super().__init__()
@@ -16,9 +23,6 @@ class ComputerAI(BaseAI):
     def getPosition(self):
         return self.pos 
 
-    def getPlayerNum(self):
-        return self.player_num
-        
     def setPlayerNum(self, num):
         self.player_num = num
 
@@ -30,18 +34,20 @@ class ComputerAI(BaseAI):
 
         # make random move
         new_pos = random.choice(available_moves) if available_moves else None
-
+        
         return new_pos
 
     def getTrap(self, grid : Grid):
-        """Get the *intended* trap move of the player"""
+
+        """EasyAI throws randomly to the immediate neighbors of the opponent"""
         
-        # find all available cells in the grid
-        available_cells = grid.getAvailableCells()
+        # find opponent
+        opponent = grid.find(3 - self.player_num)
+        
+        # find all available cells surrounding Opponent
+        available_cells = grid.get_neighbors(opponent, only_available=True)
 
-        # find all available cells
-        trap = random.choice(available_cells) if available_cells else None
-
+        # throw to one of the available cells randomly
+        trap = random.choice(available_cells)
+    
         return trap
-
-
