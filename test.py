@@ -75,11 +75,9 @@ def one_turn(turn, game):
     game.displayer.display(game.grid)
     
 class MyTestCase(unittest.TestCase):
-    def test_grid(self):
-        grid = Grid(7)
     
     def test_game(self):
-        playerAI = EasyAI()
+        playerAI = PlayerAI()
         computerAI = EasyAI()  # change this to a more sophisticated player you've coded
         displayer = Displayer()
         game = Game(playerAI=playerAI, computerAI=computerAI, N=7, displayer=displayer)
@@ -87,15 +85,7 @@ class MyTestCase(unittest.TestCase):
         displayer.display(game.grid)
         one_turn(1,game)
 
-    # test Player
-    def player_throw(self):
-        playerAI = PlayerAI()
-        computerAI = EasyAI()  # change this to a more sophisticated player you've coded
-        displayer = Displayer()
-        game = Game(playerAI=playerAI, computerAI=computerAI, N=7, displayer=displayer)
-        game.initialize_game()
-        displayer.display(game.grid)
-        playerAI.throw(game.grid,(1,3))
+        
         
 if __name__ == '__main__':
     unittest.main()

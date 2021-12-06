@@ -14,7 +14,7 @@ from Utils import manhattan_distance
 H_MAX = 8
 
 # The max_depth when searching for next trap
-TRAP_SEARCH_DEPTH = 5
+TRAP_SEARCH_DEPTH = 2
 
 class PlayerAI(BaseAI):
     
