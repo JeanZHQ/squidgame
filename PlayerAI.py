@@ -14,7 +14,7 @@ from Utils import manhattan_distance
 H_MAX = 8
 
 # The max_depth when searching for next trap
-TRAP_SEARCH_DEPTH = 2
+TRAP_SEARCH_DEPTH = 4
 
 class PlayerAI(BaseAI):
     
@@ -101,12 +101,13 @@ class PlayerAI(BaseAI):
         return probs, neighbors
     
     def H(self,grid):
+        #
         player_neighbors = grid.get_neighbors(self.pos, only_available= True)
         opponent = grid.find(3 - self.player_num)
         opponent_neighbors = grid.get_neighbors(opponent, only_available=True)
         return len(player_neighbors) - len(opponent_neighbors)
     
-    def getMax(self, grid: Grid, depth: int):
+    def getMax(self, grid: Grid, depth: int,alpha,beta):
         # find opponent
         opponent = grid.find(3 - self.player_num)
         
@@ -119,15 +120,19 @@ class PlayerAI(BaseAI):
         
         next_trap = available_cells[0]
         depth -=1
-        max_U = self.getChance(grid, next_trap,depth)
+        max_U = self.getChance(grid, next_trap,depth,alpha,beta)
         for cell in available_cells:
-            cur_U = self.getChance(grid, cell,depth)
+            cur_U = self.getChance(grid, cell,depth,alpha,beta)
             if cur_U > max_U:
                 next_trap = cell
                 max_U = cur_U
+            if max_U >=beta:
+                break
+            if  max_U > alpha:
+                alpha = max_U
         return next_trap, max_U
     
-    def getMin(self, grid: Grid,depth : int):
+    def getMin(self, grid: Grid,depth : int ,alpha, beta):
         
         # find opponent
         opponent = grid.find(3 - self.player_num)
@@ -148,13 +153,16 @@ class PlayerAI(BaseAI):
             if depth == 0:
                 cur_U = self.H(grid_clone)
             else:
-                _, cur_U = self.getMax(grid_clone,depth)
-            if cur_U >= min_U:
-                continue
-            min_U = cur_U
+                _, cur_U = self.getMax(grid_clone,depth,alpha,beta)
+            if cur_U < min_U:
+                min_U = cur_U
+            if min_U <= alpha :
+                break
+            if min_U < beta:
+                beta = min_U
         return min_U
     
-    def getChance(self, grid: Grid, intended_position: tuple,depth :int):
+    def getChance(self, grid: Grid, intended_position: tuple,depth :int,alpha,beta):
         probs, positions = self.throw(grid, intended_position)
         chance = 0
         for i in range(len(probs)):
@@ -163,7 +171,7 @@ class PlayerAI(BaseAI):
             if depth == 0:
                 chance = probs[i]*self.H(grid_copy)
             else:
-                chance = probs[i] * self.getMin(grid_copy,depth)
+                chance = probs[i] * self.getMin(grid_copy,depth,alpha,beta)
         return chance
 
     def getTrap(self, grid: Grid) -> tuple:
@@ -181,7 +189,7 @@ class PlayerAI(BaseAI):
         
         """
         
-        next_trap, max_U = self.getMax(grid, TRAP_SEARCH_DEPTH)
+        next_trap, max_U = self.getMax(grid, TRAP_SEARCH_DEPTH,float('-inf'),float('inf'))
         
         return next_trap
 
